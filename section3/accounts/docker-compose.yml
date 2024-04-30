@@ -1,0 +1,40 @@
+services:
+  accounts:
+    image: "hcnaveen/accounts:s3"
+    container_name: "account-ms"
+    ports:
+      - 8070:8070
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    networks:
+      - naviBank
+
+  loan:
+    image: "hcnaveen/loan:s3"
+    container_name: "loan-ms"
+    ports:
+      - 8080:8080
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    networks:
+      - naviBank
+
+  cards:
+    image: "hcnaveen/cards:s3"
+    container_name: "card-ms"
+    ports:
+      - 8090:8090
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    networks:
+      - naviBank
+
+networks:
+  naviBank:
+    driver: "bridge"
