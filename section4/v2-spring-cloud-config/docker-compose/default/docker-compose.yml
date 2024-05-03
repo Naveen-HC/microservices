@@ -1,0 +1,177 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: "rabbitmq"
+    hostname: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 5s
+    extends:
+      file: common-config.yml
+      service: network-config
+
+  configserver:
+    image: "hcnaveen/configserver:s4"
+    container_name: "configserver-ms"
+    ports:
+      - "8071:8071"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: "curl --fail --silent localhost:8071/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    extends:
+      file: common-config.yml
+      service: base-net-config
+
+  accounts:
+    image: "hcnaveen/accounts:s4"
+    container_name: account-ms
+    ports:
+      - "8070:8070"
+    depends_on:
+      configserver:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: "accounts"
+    extends:
+      file: common-config.yml
+      service: base-net-env-config
+
+  loan:
+    image: "hcnaveen/loan:s4"
+    container_name: "loan-ms"
+    ports:
+      - "8080:8080"
+    depends_on:
+      configserver:
+        condition: service_healthy
+    environment:
+        SPRING_APPLICATION_NAME: "loan"
+    extends:
+      file: common-config.yml
+      service: base-net-env-config
+
+  cards:
+    image: "hcnaveen/cards:s4"
+    container_name: "card-ms"
+    ports:
+      - "8090:8090"
+    depends_on:
+      configserver:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: "cards"
+    extends:
+      file: common-config.yml
+      service: base-net-env-config
+
+
+networks:
+  naviBank:
+    driver: "bridge"
+
+#services:
+#  rabbitmq:
+#    image: "rabbitmq:3.13-management"
+#    hostname: "rabbitmq"
+#    ports:
+#      - 5672:5672
+#      - 15672:15672
+#    healthcheck:
+#      test: rabbitmq-diagnostic check_port_connectivity
+#      start_period: 5s
+#      timeout: 5s
+#      interval: 10s
+#      retries: 10
+#    networks:
+#      - naviBank
+#
+#  configserver:
+#    image: "hcnaveen/configserver:s4"
+#    container_name: "configserver-ms"
+#    ports:
+#      - 8071:8071
+#    healthcheck:
+#      test: "curl --fail --silent localhost:8071/actuator/readiness | grep UP || exit 1"
+#      start_period: 10s
+#      interval: 10s
+#      timeout: 5s
+#      retries: 10
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 700m
+#    networks:
+#      - naviBank
+#
+#  accounts:
+#    image: "hcnaveen/accounts:s4"
+#    container_name: "account-ms"
+#    ports:
+#      - 8070:8070
+#    depends_on:
+#      configserver:
+#        condition: service_healthy
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 700m
+#    networks:
+#      - naviBank
+#    environment:
+#      SPRING_APPLICATION_NAME: "accounts"
+#      SPRING_CONFIG_IMPOST: "configserver:http://configserver:8071/"
+#      SPRING_PROFILES_ACTIVE: default
+#  loan:
+#    image: "hcnaveen/loan:s4"
+#    container_name: "loan-ms"
+#    ports:
+#      - 8080:8080
+#    depends_on:
+#      configserver:
+#        condition: service_healthy
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 700m
+#    networks:
+#      - naviBank
+#    environment:
+#      SPRING_APPLICATION_NAME: "loan"
+#      SPRING_CONFIG_IMPORT: "configserver:http://configserve:8071/"
+#      SPRING_PROFILES_ACTIVE: default
+#
+#  cards:
+#    image: "hcnaveen/cards:s4"
+#    container_name: "card-ms"
+#    ports:
+#      - 8090:8090
+#    depends_on:
+#      -configserver:
+#         condition: service_healthy
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 700m
+#    networks:
+#      - naviBank
+#    environment:
+#      SPRING_APPLICATION_NAME: "cards"
+#      SPRING_CONFIG_IMPORT: "configserve:http://configserver:8071/"
+#      SPRING_PROFILES_ACTIVE: default
+#
+#
+#networks:
+#  naviBank:
+#    driver: "bridge"

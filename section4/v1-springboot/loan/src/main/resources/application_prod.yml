@@ -1,0 +1,16 @@
+spring:
+  config:
+    active:
+      on-profile: "prod"
+
+build:
+  version: 1.0
+
+loan:
+  message: "Welcome to NaviBank loan production related APIs"
+  contactDetails:
+    name: "Anirudh"
+    email: "anirudh@gmail.com"
+  onCallSupport:
+    - (555) 555 1234
+    - (555) 555 4321

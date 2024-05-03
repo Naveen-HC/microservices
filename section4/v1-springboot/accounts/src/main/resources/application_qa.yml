@@ -1,0 +1,16 @@
+spring:
+  config:
+    activate:
+      on-profile: "qa"
+
+build:
+  version: 2.0
+
+accounts:
+  message: "Welcome to NaviBank accounts QA related APIs"
+  contactDetails:
+    name: "Asha"
+    email: "asha@gmail.com"
+  onCallSupport:
+    - (555) 555 1234
+    - (555) 555 4321

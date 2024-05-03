@@ -1,0 +1,16 @@
+spring:
+  config:
+    active:
+      on-profile: "qa"
+
+build:
+  version: 2.0
+
+cards:
+  message: "Welcome to NaviBank cards qa related APIs"
+  contactDetails:
+    name: "Asha1"
+    email: "asha@gmail.com"
+  onCallSupport:
+    - (555) 555 1234
+    - (555) 555 4321

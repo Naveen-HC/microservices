@@ -1,0 +1,21 @@
+services:
+  network-config:
+    networks:
+      - naviBank
+
+  base-net-config:
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    environment:
+      SPRING_RABBITMQ_HOST: "rabbitmq"
+    extends:
+      service: network-config
+
+  base-net-env-config:
+    extends:
+      service: base-net-config
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
+      SPRING_PROFILES_ACTIVE: default
