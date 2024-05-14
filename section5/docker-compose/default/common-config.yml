@@ -1,0 +1,35 @@
+services:
+  network-config:
+    networks:
+      - navibank
+
+  db-config:
+    extends:
+      service: network-config
+    image: mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 10s
+      retries: 10
+      interval: 10s
+      start_period: 10s
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+
+  base-network-config:
+    extends:
+      service: network-config
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+
+  base-network-env-config:
+    extends:
+      service: base-network-config
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+
