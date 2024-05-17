@@ -1,0 +1,21 @@
+services:
+  network-deploy-config:
+    networks:
+      - naviBank
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+
+  network-deploy-env-config:
+    extends:
+      service: network-deploy-config
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
+
+  app-config:
+    extends:
+      service: network-deploy-env-config
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:8060/eureka/
